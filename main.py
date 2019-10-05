@@ -1,5 +1,7 @@
 import argparse
 import datetime
+import os
+
 import gym
 import numpy as np
 import itertools
@@ -7,6 +9,8 @@ import torch
 from sac import SAC
 from tensorboardX import SummaryWriter
 from replay_memory import ReplayMemory
+
+DIR = os.path.dirname(os.path.realpath(__file__))
 
 
 def main():
@@ -61,12 +65,13 @@ def main():
     torch.manual_seed(args.seed)
     np.random.seed(args.seed)
     env.seed(args.seed)
+    env.reset()
 
     # Agent
     agent = SAC(env.observation_space.shape[0], env.action_space, args)
     if args.resume_name:
-        agent.load_model(f'models/sac_actor_runs/{args.resume_name}',
-                         f'models/sac_critic_runs/{args.resume_name}')
+        agent.load_model(f'{DIR}/models/sac_actor_runs/{args.resume_name}',
+                         f'{DIR}/models/sac_critic_runs/{args.resume_name}')
 
     # TesnorboardX
     run_name = 'runs/{}_SAC_{}_{}_{}'.format(
