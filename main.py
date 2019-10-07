@@ -91,6 +91,7 @@ def main():
 def train(agent, args, env, memory, run_name, writer):
     total_numsteps = 0
     updates = 0
+    run_eval = get_run_eval()
     for i_episode in itertools.count(1):
 
         episode_reward, episode_steps, total_numsteps, updates = run_episode(
@@ -106,43 +107,48 @@ def train(agent, args, env, memory, run_name, writer):
                      round(episode_reward, 2)))
 
         if i_episode % 10 == 0 and args.eval == True:
-            run_eval(agent, env, i_episode, run_name, total_numsteps, writer)
+            run_eval(agent, env, i_episode, run_name, writer)
 
 
-def run_eval(agent, env, i_episode, run_name, total_numsteps, writer):
-    total_reward = 0
-    episodes = 10
-    for _ in range(episodes):
-        state = env.reset()
-        episode_reward = 0
-        done = False
-        while not done:
-            action = agent.select_action(state, eval=True)
+def get_run_eval():
+    closure = {'total_episode_steps': 0}
 
-            next_state, reward, done, info = env.step(action)
-            episode_reward += reward
+    def fn(agent, env, i_episode, run_name, writer):
+        total_reward = 0
+        episodes = 10
+        for _ in range(episodes):
+            state = env.reset()
+            episode_reward = 0
+            done = False
+            while not done:
+                action = agent.select_action(state, eval=True)
 
-            if 'tfx' in info:
-                tfx_stats = info['tfx']
-                for name, value in tfx_stats.items():
-                    writer.add_scalar(f'info_test/{name}', value,
-                                      total_numsteps)
+                next_state, reward, done, info = env.step(action)
+                episode_reward += reward
 
-            state = next_state
-        total_reward += episode_reward
-    avg_reward = total_reward / episodes
+                if 'tfx' in info:
+                    tfx_stats = info['tfx']
+                    for name, value in tfx_stats.items():
+                        writer.add_scalar(f'info_test/{name}', value,
+                                          closure['total_episode_steps'])
 
-    writer.add_scalar('avg_reward/test', avg_reward, i_episode)
+                state = next_state
+                closure['total_episode_steps'] += 1
+            total_reward += episode_reward
+        avg_reward = total_reward / episodes
 
-    print("----------------------------------------")
-    print("Test Episodes: {}, Avg. Reward: {}".format(episodes,
-                                                      round(avg_reward, 2)))
-    print("----------------------------------------")
+        writer.add_scalar('avg_reward/test', avg_reward, i_episode)
 
-    if i_episode % 100 == 0:
-        print('Saving model...')
-        agent.save_model(run_name)
-        print('Done saving model')
+        print("----------------------------------------")
+        print("Test Episodes: {}, Avg. Reward: {}".format(episodes,
+                                                          round(avg_reward, 2)))
+        print("----------------------------------------")
+
+        if i_episode % 100 == 0:
+            print('Saving model...')
+            agent.save_model(run_name)
+            print('Done saving model')
+    return fn
 
 
 def run_episode(agent, args, env, memory, total_numsteps, updates, writer):
@@ -162,13 +168,14 @@ def run_episode(agent, args, env, memory, total_numsteps, updates, writer):
                 # Update parameters of all the networks
                 critic_1_loss, critic_2_loss, policy_loss, ent_loss, alpha = \
                     agent.update_parameters(memory, args.batch_size, updates)
-                write_update_stats(alpha, critic_1_loss, critic_2_loss,
-                                   ent_loss, policy_loss, updates, writer)
+                if updates % 100 == 0:
+                    write_update_stats(alpha, critic_1_loss, critic_2_loss,
+                                       ent_loss, policy_loss, updates, writer)
                 updates += 1
 
         next_state, reward, done, info = env.step(action)  # Step
 
-        if 'tfx' in info:
+        if 'tfx' in info and (done or total_numsteps % 100 == 0):
             tfx_stats = info['tfx']
             for name, value in tfx_stats.items():
                 writer.add_scalar(f'info_train/{name}', value,
