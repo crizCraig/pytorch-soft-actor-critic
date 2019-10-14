@@ -1,9 +1,11 @@
 import random
 import numpy as np
 
+
 class ReplayMemory:
     def __init__(self, capacity):
         self.capacity = capacity
+        # TODO: Use a deque for this
         self.buffer = []
         self.position = 0
 

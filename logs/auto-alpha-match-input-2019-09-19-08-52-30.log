@@ -1,0 +1,185 @@
+/home/c2/anaconda3/envs/dd2d/bin/python /home/c2/src/pytorch-soft-actor-critic/main.py --env-name match-input-continuous-v0 --automatic_entropy_tuning True
+Episode: 1, total numsteps: 100, episode steps: 100, reward: 42.82
+Episode: 2, total numsteps: 200, episode steps: 100, reward: 2.45
+Episode: 3, total numsteps: 300, episode steps: 100, reward: 22.1
+Episode: 4, total numsteps: 400, episode steps: 100, reward: 9.76
+Episode: 5, total numsteps: 500, episode steps: 100, reward: 52.09
+Episode: 6, total numsteps: 600, episode steps: 100, reward: 19.88
+Episode: 7, total numsteps: 700, episode steps: 100, reward: 46.03
+Episode: 8, total numsteps: 800, episode steps: 100, reward: 42.78
+Episode: 9, total numsteps: 900, episode steps: 100, reward: 31.87
+Episode: 10, total numsteps: 1000, episode steps: 100, reward: 49.18
+----------------------------------------
+Test Episodes: 10, Avg. Reward: 82.72
+----------------------------------------
+Episode: 11, total numsteps: 1100, episode steps: 100, reward: 5.92
+Episode: 12, total numsteps: 1200, episode steps: 100, reward: 30.36
+Episode: 13, total numsteps: 1300, episode steps: 100, reward: 47.73
+Episode: 14, total numsteps: 1400, episode steps: 100, reward: 10.64
+Episode: 15, total numsteps: 1500, episode steps: 100, reward: -0.73
+Episode: 16, total numsteps: 1600, episode steps: 100, reward: 49.8
+Episode: 17, total numsteps: 1700, episode steps: 100, reward: 34.92
+Episode: 18, total numsteps: 1800, episode steps: 100, reward: 30.91
+Episode: 19, total numsteps: 1900, episode steps: 100, reward: 30.3
+Episode: 20, total numsteps: 2000, episode steps: 100, reward: 33.91
+----------------------------------------
+Test Episodes: 10, Avg. Reward: 83.94
+----------------------------------------
+Episode: 21, total numsteps: 2100, episode steps: 100, reward: 16.95
+Episode: 22, total numsteps: 2200, episode steps: 100, reward: 18.04
+Episode: 23, total numsteps: 2300, episode steps: 100, reward: 6.67
+Episode: 24, total numsteps: 2400, episode steps: 100, reward: 49.53
+Episode: 25, total numsteps: 2500, episode steps: 100, reward: 48.2
+Episode: 26, total numsteps: 2600, episode steps: 100, reward: 34.91
+Episode: 27, total numsteps: 2700, episode steps: 100, reward: 27.78
+Episode: 28, total numsteps: 2800, episode steps: 100, reward: 19.03
+Episode: 29, total numsteps: 2900, episode steps: 100, reward: 52.63
+Episode: 30, total numsteps: 3000, episode steps: 100, reward: -5.64
+----------------------------------------
+Test Episodes: 10, Avg. Reward: 94.24
+----------------------------------------
+Episode: 31, total numsteps: 3100, episode steps: 100, reward: 50.15
+Episode: 32, total numsteps: 3200, episode steps: 100, reward: 50.58
+Episode: 33, total numsteps: 3300, episode steps: 100, reward: 16.16
+Episode: 34, total numsteps: 3400, episode steps: 100, reward: 23.65
+Episode: 35, total numsteps: 3500, episode steps: 100, reward: 48.18
+Episode: 36, total numsteps: 3600, episode steps: 100, reward: 46.79
+Episode: 37, total numsteps: 3700, episode steps: 100, reward: 55.9
+Episode: 38, total numsteps: 3800, episode steps: 100, reward: 51.86
+Episode: 39, total numsteps: 3900, episode steps: 100, reward: 47.94
+Episode: 40, total numsteps: 4000, episode steps: 100, reward: 13.64
+----------------------------------------
+Test Episodes: 10, Avg. Reward: 92.26
+----------------------------------------
+Episode: 41, total numsteps: 4100, episode steps: 100, reward: 44.28
+Episode: 42, total numsteps: 4200, episode steps: 100, reward: 13.21
+Episode: 43, total numsteps: 4300, episode steps: 100, reward: 29.26
+Episode: 44, total numsteps: 4400, episode steps: 100, reward: 29.69
+Episode: 45, total numsteps: 4500, episode steps: 100, reward: 25.95
+Episode: 46, total numsteps: 4600, episode steps: 100, reward: 53.23
+Episode: 47, total numsteps: 4700, episode steps: 100, reward: 48.9
+Episode: 48, total numsteps: 4800, episode steps: 100, reward: 16.69
+Episode: 49, total numsteps: 4900, episode steps: 100, reward: 45.88
+Episode: 50, total numsteps: 5000, episode steps: 100, reward: 44.48
+----------------------------------------
+Test Episodes: 10, Avg. Reward: 97.84
+----------------------------------------
+Episode: 51, total numsteps: 5100, episode steps: 100, reward: 37.1
+Episode: 52, total numsteps: 5200, episode steps: 100, reward: 39.54
+Episode: 53, total numsteps: 5300, episode steps: 100, reward: 24.27
+Episode: 54, total numsteps: 5400, episode steps: 100, reward: 40.76
+Episode: 55, total numsteps: 5500, episode steps: 100, reward: 43.65
+Episode: 56, total numsteps: 5600, episode steps: 100, reward: 36.03
+Episode: 57, total numsteps: 5700, episode steps: 100, reward: 48.89
+Episode: 58, total numsteps: 5800, episode steps: 100, reward: 47.42
+Episode: 59, total numsteps: 5900, episode steps: 100, reward: 38.24
+Episode: 60, total numsteps: 6000, episode steps: 100, reward: 7.1
+----------------------------------------
+Test Episodes: 10, Avg. Reward: 96.97
+----------------------------------------
+Episode: 61, total numsteps: 6100, episode steps: 100, reward: 1.18
+Episode: 62, total numsteps: 6200, episode steps: 100, reward: 49.36
+Episode: 63, total numsteps: 6300, episode steps: 100, reward: 40.53
+Episode: 64, total numsteps: 6400, episode steps: 100, reward: 52.47
+Episode: 65, total numsteps: 6500, episode steps: 100, reward: 48.08
+Episode: 66, total numsteps: 6600, episode steps: 100, reward: 39.8
+Episode: 67, total numsteps: 6700, episode steps: 100, reward: 8.24
+Episode: 68, total numsteps: 6800, episode steps: 100, reward: 47.78
+Episode: 69, total numsteps: 6900, episode steps: 100, reward: 43.35
+Episode: 70, total numsteps: 7000, episode steps: 100, reward: 20.25
+----------------------------------------
+Test Episodes: 10, Avg. Reward: 92.65
+----------------------------------------
+Episode: 71, total numsteps: 7100, episode steps: 100, reward: 41.37
+Episode: 72, total numsteps: 7200, episode steps: 100, reward: 44.97
+Episode: 73, total numsteps: 7300, episode steps: 100, reward: 21.87
+Episode: 74, total numsteps: 7400, episode steps: 100, reward: 3.88
+Episode: 75, total numsteps: 7500, episode steps: 100, reward: 13.85
+Episode: 76, total numsteps: 7600, episode steps: 100, reward: 36.02
+Episode: 77, total numsteps: 7700, episode steps: 100, reward: 42.05
+Episode: 78, total numsteps: 7800, episode steps: 100, reward: 11.11
+Episode: 79, total numsteps: 7900, episode steps: 100, reward: 30.98
+Episode: 80, total numsteps: 8000, episode steps: 100, reward: 47.44
+----------------------------------------
+Test Episodes: 10, Avg. Reward: 96.94
+----------------------------------------
+Episode: 81, total numsteps: 8100, episode steps: 100, reward: 45.5
+Episode: 82, total numsteps: 8200, episode steps: 100, reward: 42.72
+Episode: 83, total numsteps: 8300, episode steps: 100, reward: 27.12
+Episode: 84, total numsteps: 8400, episode steps: 100, reward: 40.56
+Episode: 85, total numsteps: 8500, episode steps: 100, reward: 45.33
+Episode: 86, total numsteps: 8600, episode steps: 100, reward: 24.46
+Episode: 87, total numsteps: 8700, episode steps: 100, reward: 42.62
+Episode: 88, total numsteps: 8800, episode steps: 100, reward: 50.84
+Episode: 89, total numsteps: 8900, episode steps: 100, reward: 43.25
+Episode: 90, total numsteps: 9000, episode steps: 100, reward: 30.66
+----------------------------------------
+Test Episodes: 10, Avg. Reward: 94.58
+----------------------------------------
+Episode: 91, total numsteps: 9100, episode steps: 100, reward: 2.61
+Episode: 92, total numsteps: 9200, episode steps: 100, reward: 47.92
+Episode: 93, total numsteps: 9300, episode steps: 100, reward: 40.7
+Episode: 94, total numsteps: 9400, episode steps: 100, reward: 48.23
+Episode: 95, total numsteps: 9500, episode steps: 100, reward: 10.53
+Episode: 96, total numsteps: 9600, episode steps: 100, reward: 12.8
+Episode: 97, total numsteps: 9700, episode steps: 100, reward: 48.17
+Episode: 98, total numsteps: 9800, episode steps: 100, reward: 9.99
+Episode: 99, total numsteps: 9900, episode steps: 100, reward: 25.09
+Episode: 100, total numsteps: 10000, episode steps: 100, reward: 16.25
+----------------------------------------
+Test Episodes: 10, Avg. Reward: 97.01
+----------------------------------------
+Episode: 101, total numsteps: 10100, episode steps: 100, reward: 86.98
+Episode: 102, total numsteps: 10200, episode steps: 100, reward: 87.15
+Episode: 103, total numsteps: 10300, episode steps: 100, reward: 88.64
+Episode: 104, total numsteps: 10400, episode steps: 100, reward: 91.19
+Episode: 105, total numsteps: 10500, episode steps: 100, reward: 86.14
+Episode: 106, total numsteps: 10600, episode steps: 100, reward: 92.88
+Episode: 107, total numsteps: 10700, episode steps: 100, reward: 88.94
+Episode: 108, total numsteps: 10800, episode steps: 100, reward: 93.26
+Episode: 109, total numsteps: 10900, episode steps: 100, reward: 88.89
+Episode: 110, total numsteps: 11000, episode steps: 100, reward: 90.82
+----------------------------------------
+Test Episodes: 10, Avg. Reward: 90.29
+----------------------------------------
+Episode: 111, total numsteps: 11100, episode steps: 100, reward: 88.18
+Episode: 112, total numsteps: 11200, episode steps: 100, reward: 92.79
+Episode: 113, total numsteps: 11300, episode steps: 100, reward: 93.88
+Episode: 114, total numsteps: 11400, episode steps: 100, reward: 88.6
+Episode: 115, total numsteps: 11500, episode steps: 100, reward: 86.55
+Episode: 116, total numsteps: 11600, episode steps: 100, reward: 90.53
+Episode: 117, total numsteps: 11700, episode steps: 100, reward: 90.51
+Episode: 118, total numsteps: 11800, episode steps: 100, reward: 91.29
+Episode: 119, total numsteps: 11900, episode steps: 100, reward: 88.72
+Episode: 120, total numsteps: 12000, episode steps: 100, reward: 88.15
+----------------------------------------
+Test Episodes: 10, Avg. Reward: 97.66
+----------------------------------------
+Episode: 121, total numsteps: 12100, episode steps: 100, reward: 91.53
+Episode: 122, total numsteps: 12200, episode steps: 100, reward: 88.74
+Episode: 123, total numsteps: 12300, episode steps: 100, reward: 90.57
+Episode: 124, total numsteps: 12400, episode steps: 100, reward: 93.1
+Episode: 125, total numsteps: 12500, episode steps: 100, reward: 94.09
+Episode: 126, total numsteps: 12600, episode steps: 100, reward: 89.76
+Episode: 127, total numsteps: 12700, episode steps: 100, reward: 90.76
+Episode: 128, total numsteps: 12800, episode steps: 100, reward: 87.71
+Episode: 129, total numsteps: 12900, episode steps: 100, reward: 93.41
+Episode: 130, total numsteps: 13000, episode steps: 100, reward: 88.27
+----------------------------------------
+Test Episodes: 10, Avg. Reward: 93.74
+----------------------------------------
+Episode: 131, total numsteps: 13100, episode steps: 100, reward: 93.17
+Episode: 132, total numsteps: 13200, episode steps: 100, reward: 90.05
+Episode: 133, total numsteps: 13300, episode steps: 100, reward: 93.92
+Traceback (most recent call last):
+  File "/home/c2/src/pytorch-soft-actor-critic/main.py", line 87, in <module>
+    critic_1_loss, critic_2_loss, policy_loss, ent_loss, alpha = agent.update_parameters(memory, args.batch_size, updates)
+  File "/home/c2/src/pytorch-soft-actor-critic/sac.py", line 84, in update_parameters
+    qf2_loss.backward()
+  File "/home/c2/anaconda3/envs/dd2d/lib/python3.7/site-packages/torch/tensor.py", line 118, in backward
+    torch.autograd.backward(self, gradient, retain_graph, create_graph)
+  File "/home/c2/anaconda3/envs/dd2d/lib/python3.7/site-packages/torch/autograd/__init__.py", line 93, in backward
+    allow_unreachable=True)  # allow_unreachable flag
+KeyboardInterrupt
+
+Process finished with exit code 1
