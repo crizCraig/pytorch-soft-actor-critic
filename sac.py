@@ -1,6 +1,8 @@
 import os
-import torch
+import torch.nn.utils.clip_grad
 import torch.nn.functional as F
+from loguru import logger as log
+
 from torch.optim import Adam
 from utils import soft_update, hard_update
 from model import GaussianPolicy, QNetwork, DeterministicPolicy
@@ -76,16 +78,20 @@ class SAC(object):
 
         policy_loss = ((self.alpha * log_pi) - min_qf_pi).mean() # Jπ = 𝔼st∼D,εt∼N[α * logπ(f(εt;st)|st) − Q(st,f(εt;st))]
 
+
         self.critic_optim.zero_grad()
         qf1_loss.backward()
+        self.clip_gradients(self.critic.parameters())
         self.critic_optim.step()
 
         self.critic_optim.zero_grad()
         qf2_loss.backward()
+        self.clip_gradients(self.critic.parameters())
         self.critic_optim.step()
         
         self.policy_optim.zero_grad()
         policy_loss.backward()
+        self.clip_gradients(self.policy.parameters())
         self.policy_optim.step()
 
         if self.automatic_entropy_tuning:
@@ -93,19 +99,28 @@ class SAC(object):
 
             self.alpha_optim.zero_grad()
             alpha_loss.backward()
+            self.clip_gradients(self.policy.parameters())
             self.alpha_optim.step()
 
             self.alpha = self.log_alpha.exp()
-            alpha_tlogs = self.alpha.clone() # For TensorboardX logs
+            alpha_tlogs = self.alpha.clone()  # For TensorboardX logs
         else:
             alpha_loss = torch.tensor(0.).to(self.device)
-            alpha_tlogs = torch.tensor(self.alpha) # For TensorboardX logs
+            alpha_tlogs = torch.tensor(self.alpha)  # For TensorboardX logs
 
 
         if updates % self.target_update_interval == 0:
             soft_update(self.critic_target, self.critic, self.tau)
 
         return qf1_loss.item(), qf2_loss.item(), policy_loss.item(), alpha_loss.item(), alpha_tlogs.item()
+
+    def clip_gradients(self, params_to_clip):
+        max_norm = 100
+        grad_norm = torch.nn.utils.clip_grad.clip_grad_norm_(
+            params_to_clip, max_norm=max_norm)
+        if grad_norm > max_norm:
+            log.warning(f'Large grad norm of {grad_norm} clipped to {max_norm}')
+
 
     # Save model parameters
     def save_model(self, env_name, suffix="", actor_path=None, critic_path=None):
