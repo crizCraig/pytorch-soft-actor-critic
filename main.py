@@ -42,7 +42,7 @@ def main():
                         help='random seed (default: 456)')
     parser.add_argument('--batch_size', type=int, default=256, metavar='N',
                         help='batch size (default: 256)')
-    parser.add_argument('--num_steps', type=int, default=2000001, metavar='N',
+    parser.add_argument('--num_steps', type=int, default=10**7+1, metavar='N',
                         help='maximum number of steps (default: 2000000)')
     parser.add_argument('--hidden_size', type=int, default=256, metavar='N',
                         help='hidden size (default: 256)')
