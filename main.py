@@ -1,18 +1,24 @@
 import argparse
 import datetime
 import os
+import sys
 
 import gym
 import numpy as np
 import itertools
 import torch
+from box import Box
+
 from sac import SAC
 from tensorboardX import SummaryWriter
 from replay_memory import ReplayMemory
 
+from loguru import logger as log
+
 DIR = os.path.dirname(os.path.realpath(__file__))
 
 
+@log.catch
 def main():
     parser = argparse.ArgumentParser(description='PyTorch REINFORCE example')
     parser.add_argument('--env-name', default="HalfCheetah-v2",
@@ -59,6 +65,19 @@ def main():
     import gym_match_input_continuous
     import deepdrive_2d
 
+    # TesnorboardX
+    run_name = '{}_SAC_{}_{}_{}'.format(
+        datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"),
+        args.env_name,
+        args.policy,
+        "autotune" if args.automatic_entropy_tuning else "")
+
+    # Log to file
+    os.makedirs('logs', exist_ok=True)
+    log.add(f'logs/{run_name}.log')
+
+    log.info(' '.join(sys.argv))
+
     # Environment
     # env = NormalizedActions(gym.make(args.env_name))
     env = gym.make(args.env_name)
@@ -73,12 +92,10 @@ def main():
         agent.load_model(f'{DIR}/models/sac_actor_runs/{args.resume_name}',
                          f'{DIR}/models/sac_critic_runs/{args.resume_name}')
 
-    # TesnorboardX
-    run_name = 'runs/{}_SAC_{}_{}_{}'.format(
-        datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"),
-        args.env_name,
-        args.policy,
-        "autotune" if args.automatic_entropy_tuning else "")
+
+
+    run_name = 'runs/' + run_name
+
     writer = SummaryWriter(logdir=run_name)
 
     # Memory
@@ -92,34 +109,47 @@ def train(agent, args, env, memory, run_name, writer):
     total_numsteps = 0
     updates = 0
     run_eval = get_run_eval()
+    wins = 0
     for i_episode in itertools.count(1):
 
-        episode_reward, episode_steps, total_numsteps, updates = run_episode(
-            agent=agent, args=args, env=env, memory=memory,
-            total_numsteps=total_numsteps, updates=updates, writer=writer)
+        episode_reward, episode_steps, total_numsteps, updates, info = \
+            run_episode(agent=agent, args=args, env=env, memory=memory,
+                        total_numsteps=total_numsteps, updates=updates,
+                        writer=writer)
 
         if total_numsteps > args.num_steps:
             break
 
         writer.add_scalar('reward/train', episode_reward, i_episode)
-        print("Episode: {}, total numsteps: {}, episode steps: {}, reward: {}".
-              format(i_episode, total_numsteps, episode_steps,
-                     round(episode_reward, 2)))
+        info = dbox(info)
+        if 'all_time' in info.tfx:
+            for name, value in info.tfx.all_time.items():
+                writer.add_scalar(f'all_time_train/{name}', value, i_episode)
+                if name == 'won':
+                    wins += 1
+                    writer.add_scalar(f'all_time_train/win_pct',
+                                      100 * wins / i_episode, i_episode)
+        log.info(
+            "Episode: {}, total numsteps: {}, episode steps: {}, reward: {}".
+            format(i_episode, total_numsteps, episode_steps,
+                   round(episode_reward, 2)))
 
         if i_episode % 10 == 0 and args.eval == True:
             run_eval(agent, env, i_episode, run_name, writer)
 
 
 def get_run_eval():
-    closure = {'total_episode_steps': 0}
+    closure = Box(total_episode_steps=0, wins=0, eval_episodes=0)
 
-    def fn(agent, env, i_episode, run_name, writer):
+    def run_eval(agent, env, i_episode, run_name, writer):
         total_reward = 0
         episodes = 10
         for _ in range(episodes):
+            closure.eval_episodes += 1
             state = env.reset()
             episode_reward = 0
             done = False
+            info = Box(default_box=True)
             while not done:
                 action = agent.select_action(state, eval=True)
 
@@ -129,26 +159,39 @@ def get_run_eval():
                 if 'tfx' in info:
                     tfx_stats = info['tfx']
                     for name, value in tfx_stats.items():
-                        writer.add_scalar(f'info_test/{name}', value,
-                                          closure['total_episode_steps'])
+                        if name != 'all_time':
+                            writer.add_scalar(f'info_test/{name}', value,
+                                              closure.total_episode_steps)
 
                 state = next_state
                 closure['total_episode_steps'] += 1
+            info = dbox(info)
+            if 'all_time' in info.tfx:
+                for name, value in info.tfx.all_time.items():
+                    writer.add_scalar(f'all_time_eval/{name}', value,
+                                      closure.eval_episodes)
+                    if name == 'won':
+                        closure.wins += 1
+                        writer.add_scalar(
+                            f'all_time_eval/win_pct',
+                            100 * closure.wins / closure.eval_episodes,
+                            closure.eval_episodes)
+
             total_reward += episode_reward
         avg_reward = total_reward / episodes
 
         writer.add_scalar('avg_reward/test', avg_reward, i_episode)
 
-        print("----------------------------------------")
-        print("Test Episodes: {}, Avg. Reward: {}".format(episodes,
-                                                          round(avg_reward, 2)))
-        print("----------------------------------------")
+        log.info("----------------------------------------")
+        log.info("Test Episodes: {}, Avg. Reward: {}".format(
+            episodes, round(avg_reward, 2)))
+        log.info("----------------------------------------")
 
         if i_episode % 100 == 0:
-            print('Saving model...')
+            log.info('Saving model...')
             agent.save_model(run_name)
-            print('Done saving model')
-    return fn
+            log.info('Done saving model')
+    return run_eval
 
 
 def run_episode(agent, args, env, memory, total_numsteps, updates, writer):
@@ -156,6 +199,7 @@ def run_episode(agent, args, env, memory, total_numsteps, updates, writer):
     episode_steps = 0
     done = False
     state = env.reset()
+    info = Box(default_box=True)
     while not done:
         if args.start_steps > total_numsteps:
             action = env.action_space.sample()  # Sample random action
@@ -175,11 +219,7 @@ def run_episode(agent, args, env, memory, total_numsteps, updates, writer):
 
         next_state, reward, done, info = env.step(action)  # Step
 
-        if 'tfx' in info and (done or total_numsteps % 100 == 0):
-            tfx_stats = info['tfx']
-            for name, value in tfx_stats.items():
-                writer.add_scalar(f'info_train/{name}', value,
-                                  total_numsteps)
+        write_tfx_info(done, info, total_numsteps, writer)
 
         episode_steps += 1
         total_numsteps += 1
@@ -193,7 +233,18 @@ def run_episode(agent, args, env, memory, total_numsteps, updates, writer):
         memory.push(state, action, reward, next_state, mask)
 
         state = next_state
-    return episode_reward, episode_steps, total_numsteps, updates
+
+
+    return episode_reward, episode_steps, total_numsteps, updates, info
+
+
+def write_tfx_info(done, info, total_numsteps, writer):
+    if 'tfx' in info and (done or total_numsteps % 100 == 0):
+        tfx_stats = info['tfx']
+        for name, value in tfx_stats.items():
+            if name != 'all_time':
+                writer.add_scalar(f'info_train/{name}', value,
+                                  total_numsteps)
 
 
 def write_update_stats(alpha, critic_1_loss, critic_2_loss, ent_loss,
@@ -203,6 +254,14 @@ def write_update_stats(alpha, critic_1_loss, critic_2_loss, ent_loss,
     writer.add_scalar('loss/policy', policy_loss, updates)
     writer.add_scalar('loss/entropy_loss', ent_loss, updates)
     writer.add_scalar('entropy_temprature/alpha', alpha, updates)
+
+
+def dbox(obj=None, **kwargs):
+    if kwargs:
+        obj = dict(kwargs)
+    else:
+        obj = obj or {}
+    return Box(obj, default_box=True)
 
 
 if __name__ == '__main__':
