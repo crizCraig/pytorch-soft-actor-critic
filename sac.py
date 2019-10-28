@@ -119,7 +119,7 @@ class SAC(object):
         grad_norm = torch.nn.utils.clip_grad.clip_grad_norm_(
             params_to_clip, max_norm=max_norm)
         if grad_norm > max_norm:
-            log.warning(f'Large grad norm of {grad_norm} clipped to {max_norm}')
+            log.trace(f'Large grad norm of {grad_norm} clipped to {max_norm}')
 
 
     # Save model parameters
