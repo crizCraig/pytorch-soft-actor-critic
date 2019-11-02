@@ -1,10 +1,17 @@
+import sys
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.distributions import Normal
+import math
 
-LOG_SIG_MAX = 2
 LOG_SIG_MIN = -20
+if '--small-std-dev' in sys.argv:
+    LOG_SIG_MAX = math.log(1)
+else:
+    LOG_SIG_MAX = 2
+
 epsilon = 1e-6
 
 # Initialize Policy weights
