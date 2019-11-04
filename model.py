@@ -99,6 +99,14 @@ class GaussianPolicy(nn.Module):
         return mean, log_std
 
     def sample(self, state):
+        """
+        Returns
+            action: for train sampling
+                includes random deviation per learned std
+            log_prob:
+            mean:
+                for eval sampling, no randomness
+        """
         mean, log_std = self.forward(state)
         std = log_std.exp()
         normal = Normal(mean, std)
