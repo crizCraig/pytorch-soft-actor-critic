@@ -131,13 +131,13 @@ class SAC(object):
             actor_path = "models/sac_actor_{}_{}".format(env_name, suffix)
         if critic_path is None:
             critic_path = "models/sac_critic_{}_{}".format(env_name, suffix)
-        print('Saving models to {} and {}'.format(actor_path, critic_path))
+        log.info('Saving models to {} and {}'.format(actor_path, critic_path))
         torch.save(self.policy.state_dict(), actor_path)
         torch.save(self.critic.state_dict(), critic_path)
     
     # Load model parameters
     def load_model(self, actor_path, critic_path):
-        print('Loading models from {} and {}'.format(actor_path, critic_path))
+        log.info('Loading models from {} and {}'.format(actor_path, critic_path))
         if actor_path is not None:
             self.policy.load_state_dict(torch.load(actor_path))
         if critic_path is not None:

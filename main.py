@@ -18,6 +18,7 @@ from loguru import logger as log
 DIR = os.path.dirname(os.path.realpath(__file__))
 
 
+# noinspection PyUnresolvedReferences,PyUnresolvedReferences
 @log.catch
 def main():
     parser = argparse.ArgumentParser(description='PyTorch REINFORCE example')
@@ -29,39 +30,42 @@ def main():
                         help='Evaluates a policy a policy every 10 episode (default:True)')
     parser.add_argument('--gamma', type=float, default=0.99, metavar='G',
                         help='discount factor for reward (default: 0.99)')
-    parser.add_argument('--tau', type=float, default=0.005, metavar='G',
+    parser.add_argument('--tau', type=float, default=0.005, metavar='T',
                         help='target smoothing coefficient(τ) (default: 0.005)')
-    parser.add_argument('--lr', type=float, default=0.0003, metavar='G',
-                        help='learning rate (default: 0.0003)')
-    parser.add_argument('--alpha', type=float, default=0.2, metavar='G',
+    parser.add_argument('--lr', type=float, default=8e-5,
+                        help='learning rate')
+    parser.add_argument('--alpha', type=float, default=0.2,
                         help='Temperature parameter α determines the relative importance of the entropy term against the reward (default: 0.2)')
     parser.add_argument('--automatic_entropy_tuning', type=bool, default=False,
-                        metavar='G',
+
                         help='Temperature parameter α automaically adjusted.')
-    parser.add_argument('--seed', type=int, default=456, metavar='N',
+    parser.add_argument('--seed', type=int, default=456,
                         help='random seed (default: 456)')
-    parser.add_argument('--batch_size', type=int, default=256, metavar='N',
+    parser.add_argument('--batch_size', type=int, default=256,
                         help='batch size (default: 256)')
-    parser.add_argument('--num_steps', type=int, default=10**7+1, metavar='N',
+    parser.add_argument('--num_steps', type=int, default=10**7+1,
                         help='maximum number of steps (default: 2000000)')
-    parser.add_argument('--hidden_size', type=int, default=256, metavar='N',
+    parser.add_argument('--hidden_size', type=int, default=256,
                         help='hidden size (default: 256)')
-    parser.add_argument('--updates_per_step', type=int, default=1, metavar='N',
+    parser.add_argument('--updates_per_step', type=int, default=1,
                         help='model updates per simulator step (default: 1)')
-    parser.add_argument('--start_steps', type=int, default=10000, metavar='N',
+    parser.add_argument('--start_steps', type=int, default=10000,
                         help='Steps sampling random actions (default: 10000)')
     parser.add_argument('--target_update_interval', type=int, default=1,
-                        metavar='N',
+
                         help='Value target update per no. of updates per step (default: 1)')
-    parser.add_argument('--replay_size', type=int, default=1000000, metavar='N',
+    parser.add_argument('--replay_size', type=int, default=1000000,
                         help='size of replay buffer (default: 10000000)')
     parser.add_argument('--cuda', action="store_true",
                         help='run on CUDA (default: False)')
-    parser.add_argument('--resume-name', default=None,
+    parser.add_argument('--resume_name', default=None,
                         help='Name of saved model to load')
+    parser.add_argument('--eval_only', default=False, action='store_true',
+                        help='Disable training and just evaluate the agent')
     args, unknown = parser.parse_known_args()
 
     # Import custom envs
+    # noinspection PyUnresolvedReferences
     import gym_match_input_continuous
     import deepdrive_2d
 
@@ -89,10 +93,9 @@ def main():
     # Agent
     agent = SAC(env.observation_space.shape[0], env.action_space, args)
     if args.resume_name:
+        log.info(f'Loading {args.resume_name}')
         agent.load_model(f'{DIR}/models/sac_actor_runs/{args.resume_name}',
                          f'{DIR}/models/sac_critic_runs/{args.resume_name}')
-
-
 
     run_name = 'runs/' + run_name
 
@@ -101,7 +104,14 @@ def main():
     # Memory
     memory = ReplayMemory(args.replay_size)
 
-    train(agent, args, env, memory, run_name, writer)
+    if args.eval_only:
+        run_eval = get_run_eval()
+        i_episode = 0
+        while True:
+            run_eval(agent, env, i_episode, run_name, writer)
+            i_episode += 1
+    else:
+        train(agent, args, env, memory, run_name, writer)
     env.close()
 
 
@@ -138,13 +148,16 @@ def train(agent, args, env, memory, run_name, writer):
             run_eval(agent, env, i_episode, run_name, writer)
 
 
-def get_run_eval():
-    closure = Box(total_episode_steps=0, wins=0, eval_episodes=0)
+def get_run_eval(eval_only=False):
+    closure = Box(total_episode_steps=0, wins=0, eval_episodes=0,
+                  eval_only=eval_only)
 
     def run_eval(agent, env, i_episode, run_name, writer):
         total_reward = 0
-        episodes = 10
-        for _ in range(episodes):
+        num_episodes = 10
+        angle_accuracies = []
+        gforce_values = []
+        for _ in range(num_episodes):
             closure.eval_episodes += 1
             state = env.reset()
             episode_reward = 0
@@ -157,6 +170,9 @@ def get_run_eval():
                 episode_reward += reward
 
                 if 'tfx' in info:
+                    if 'angle_accuracy' in info['tfx']:
+                        angle_accuracies.append(info['tfx']['angle_accuracy'])
+                        gforce_values.append(info['tfx']['gforce'])
                     tfx_stats = info['tfx']
                     for name, value in tfx_stats.items():
                         if name != 'all_time':
@@ -178,19 +194,25 @@ def get_run_eval():
                             closure.eval_episodes)
 
             total_reward += episode_reward
-        avg_reward = total_reward / episodes
+
+        avg_reward = total_reward / num_episodes
 
         writer.add_scalar('avg_reward/test', avg_reward, i_episode)
 
         log.info("----------------------------------------")
-        log.info("Test Episodes: {}, Avg. Reward: {}".format(
-            episodes, round(avg_reward, 2)))
+        log.info(f'Test Episodes: {num_episodes}, Avg. Reward: {round(avg_reward, 2)}, Episode: {i_episode}')
         log.info("----------------------------------------")
 
-        if i_episode % 100 == 0:
-            log.info('Saving model...')
-            agent.save_model(run_name)
-            log.info('Done saving model')
+        if len(angle_accuracies) >= num_episodes:
+            mean_angle_accuracy = np.array(angle_accuracies).mean()
+            mean_gforce = np.array(gforce_values).mean()
+            max_gforce = max(gforce_values)
+            log.info(f'Mean eval angle accuracy: {mean_angle_accuracy}')
+            if not closure.eval_only and mean_angle_accuracy >= 0.98 and max_gforce <= 0.07 and mean_gforce <= 0.06:
+                model_name = f'{run_name}_{i_episode}_a-{round(100*mean_angle_accuracy)}_g-{round(mean_gforce, 2)}_mg-{round(max_gforce, 2)}'
+                log.info('Saving model...')
+                agent.save_model(model_name)
+                log.info('Done saving model')
     return run_eval
 
 
