@@ -38,7 +38,7 @@ def main():
                         help='Temperature parameter α determines the relative importance of the entropy term against the reward (default: 0.2)')
     parser.add_argument('--automatic_entropy_tuning', type=bool, default=False,
 
-                        help='Temperature parameter α automaically adjusted.')
+                        help='Temperature parameter α automatically adjusted.')
     parser.add_argument('--seed', type=int, default=456,
                         help='random seed (default: 456)')
     parser.add_argument('--batch_size', type=int, default=256,
